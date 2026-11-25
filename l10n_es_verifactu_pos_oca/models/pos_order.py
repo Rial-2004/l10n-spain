@@ -18,20 +18,6 @@ VERIFACTU_STATE_MAPPING = {
 }
 
 
-class VerifactuMixin(models.AbstractModel):
-    name = "verifactu.mixin"
-    _inherit = ["verifactu.mixin"]
-
-    @api.model
-    def _get_verifactu_reference_models(self):
-        """This method is used to define the models that can be used as
-        previous documents in the VERI*FACTU mixin.
-        """
-        models = super()._get_verifactu_reference_models()
-        models.append("pos.order")
-        return models
-
-
 class PosOrder(models.Model):
     _name = "pos.order"
     _inherit = ["pos.order", "verifactu.mixin"]
@@ -157,23 +143,6 @@ class PosOrder(models.Model):
 
     def _get_verifactu_amount_total(self):
         return self.amount_total
-
-    def get_verifactu_document(self, invoice_num, ids):
-        """
-        Get the POS order document based on the invoice number
-        and the provided IDs.
-        Used in verifactu.invoice.entry model to find the document
-        for the response lines.
-        """
-        return self.search(
-            [
-                "|",
-                ("l10n_es_unique_id", "=", invoice_num),
-                ("pos_reference", "=", invoice_num),
-                ("id", "in", ids),
-            ],
-            limit=1,
-        )
 
     def _get_verifactu_description(self):
         return self.verifactu_description or self.company_id.verifactu_description
